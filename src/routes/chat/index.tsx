@@ -1,8 +1,11 @@
-import { For, createSignal } from "solid-js";
-import { z } from 'zod'
-import createLocalStorageSignal from '~/signal/createLocalStorageSignal';
 
-type Content = { who: string; text: string; finishReason: string };
+import { isServer } from 'solid-js/web'
+import { Peer } from 'peerjs';
+import { For, createSignal } from "solid-js";
+import { nanoid } from 'nanoid'
+import {z} from 'zod';
+
+type Content = { who: string; text: string; };
 
 const apiSchema = z
     .object({
@@ -12,10 +15,35 @@ const apiSchema = z
     .array();
 
 
-export default function GenerateCode() {
-    const [store, setStore] = createLocalStorageSignal<Content[]>('conversation', []);
+export default function StartChat() {
+    const id = 'jhbfkgryjbvegluyhcvlausyevtrilbsuhncluhyfvgizhsbdchgbkb';
+    const [store, setStore] = createSignal<Content[]>([]);
     const [inputRef, setInputRef] = createSignal<HTMLTextAreaElement>()
     const [loading, setLoading] = createSignal(false);
+
+    const [peer, setPeer] = createSignal<Peer | null>(null);
+
+    if (!isServer) {
+      setPeer(new Peer(id));
+      //const conn = peer();
+      peer()?.on("connection", (conn) => {
+        conn.on("data", (data) => {
+          // Will print 'hi!'
+          console.log(data);
+        });
+        conn.on("open", () => {
+          conn.send("hello!");
+          console.log('open')
+        });
+        conn.on('error', (err) => {
+          console.error(err);
+        })
+      });
+    }
+    setInterval(() => {
+      console.log(peer()?.open)
+      // peer()?.listAllPeers((list) => console.table(list))
+    }, 5000)
 
     const updateData = async () => {
         setLoading(true);
@@ -24,24 +52,22 @@ export default function GenerateCode() {
         const text = ref.value;
         setStore(p => [...p, ({
           text,
-          who: 'me',
-          finishReason: 'submit'
+          who: 'me'
         })])
 
-        const res = await fetch("/api/ai/chat", { method: "post", body: text, }).then((r) => r.json())
-        const parsed = await apiSchema.parse(res);
+        // const res = await fetch("/api/ai/chat", { method: "post", body: text, }).then((r) => r.json())
+        // const parsed = await apiSchema.parse(res);
 
-        console.table(parsed)
-        // clean input value
-        ref.value = ''
-        setStore((p) => [
-            ...p,
-            {
-                who: "bot",
-                text: parsed[0].text,
-                finishReason: parsed[0].finish_reason,
-            },
-        ]);
+        // console.table(parsed)
+        // // clean input value
+        // ref.value = ''
+        // setStore((p) => [
+        //     ...p,
+        //     {
+        //         who: "bot",
+        //         text: parsed[0].text
+        //     },
+        // ]);
 
         setLoading(false);
     };
@@ -49,7 +75,7 @@ export default function GenerateCode() {
     return (
         <main class="flex flex-col gap-3 justify-center items-center">
             <h1 class="max-6-xs text-6xl text-sky-300 font-thin capitalize my-16">
-                generate Chat
+                Start Chat "{id}"
             </h1>
             <article class="flex flex-col">
                 <For each={store()} fallback={<>start your chat...</>}>
@@ -57,16 +83,8 @@ export default function GenerateCode() {
                       <>
                         <div class="flex gap-2 flex-wrap text-sm">
                           <span class="font-bold uppercase">{item.who}:</span>
-                          <p class="max-w-prose">{item.text}</p>
+                          <pre class="max-w-prose">{item.text}</pre>
                         </div>
-                        <span class="text-sm flex gap-3">
-                          <span>
-                            Finish reason:
-                          </span>
-                          <span class="bg-black text-white px-2 py-0 rounded">
-                            {item.finishReason}
-                          </span>
-                        </span>
                       </>
                     )}
                 </For>
