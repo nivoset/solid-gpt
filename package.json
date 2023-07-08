@@ -19,7 +19,6 @@
     "@solidjs/router": "^0.8.2",
     "nanoid": "^4.0.2",
     "openai": "^3.3.0",
-    "peerjs": "^1.4.7",
     "solid-js": "^1.7.2",
     "solid-start": "^0.2.26",
     "undici": "^5.15.1",
