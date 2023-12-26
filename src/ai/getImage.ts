@@ -2,7 +2,7 @@ import type { CreateImageRequestSizeEnum } from "openai";
 import { openai } from "./openai.js";
 
 const getSize = (size: string): CreateImageRequestSizeEnum => {
-  switch (size) {
+  switch (`${size}`.toLowerCase()) {
     case "small":
       return "256x256";
     case "medium":
@@ -21,7 +21,6 @@ export const getImage = async ({
   prompt: string;
   size: string;
 }) => {
-  console.log(prompt);
   try {
     const response = await openai.createImage({
       prompt,
@@ -29,6 +28,7 @@ export const getImage = async ({
       size: getSize(size), //"256x256",
       user: "test-account",
       response_format: "url", // base64?
+      
     });
     const image_url = response.data.data?.find(Boolean)?.url;
     console.log(image_url);
