@@ -24,25 +24,21 @@ export const getImage = async ({
   try {
     const response = await openai.createImage({
       prompt,
-      n: 3,
-      size: getSize(size), //"256x256",
+      n: 1,
+      size: getSize(size),
       user: "test-account",
-      response_format: "url", // base64?
-      
+      response_format: "b64_json",
     });
 
-    const urls = response.data.data.map((d) => d.url);
-    const images = await Promise.all(urls.map((url) => fetch(`${url}`).then((res) => res.arrayBuffer())));
-    const base64Images = images.map((image) => `data:image/png;base64,${Buffer.from(image).toString("base64")}`);
+    const images = response.data.data.map((d) => `data:image/png;base64,${d.b64_json}`);
 
-    return JSON.stringify({ prompt, images: base64Images });
-
+    return ({ prompt, images });
   } catch (e: unknown) {
     if (e instanceof Error) {
       console.log("Error", e.message, ((e as any).response.status));
-      return JSON.stringify({ prompt, error: e.message, images: [] });
+      return ({ prompt, error: e.message, images: [] });
     }
     console.log("Error", e && (typeof e === "object" && 'message' in e ? e.message : Object.keys(e)) );
-    return JSON.stringify({ prompt, error: 'Error generating image(s)', images: []});
+    return ({ prompt, error: 'Error generating image(s)', images: []});
   }
 };
