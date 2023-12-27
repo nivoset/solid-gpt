@@ -24,7 +24,7 @@ export const getImage = async ({
   try {
     const response = await openai.createImage({
       prompt,
-      n: 1,
+      n: 3,
       size: getSize(size), //"256x256",
       user: "test-account",
       response_format: "url", // base64?
@@ -39,7 +39,7 @@ export const getImage = async ({
 
   } catch (e: unknown) {
     if (e instanceof Error) {
-      console.log("Error", e.message);
+      console.log("Error", e.message, ((e as any).response.status));
       return JSON.stringify({ prompt, error: e.message, images: [] });
     }
     console.log("Error", e && (typeof e === "object" && 'message' in e ? e.message : Object.keys(e)) );

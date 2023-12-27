@@ -21,6 +21,7 @@ export default function GenerateImage() {
       setErrorValue(res.error);
       return;
     }
+    setErrorValue(null);
     setImage(res.images);
   }
 
@@ -61,7 +62,7 @@ export default function GenerateImage() {
         Submit ({`${loading()}`})
       </button>
 
-      <div class="flex flex-wrap gap-3 pt-5">
+      <div class="flex flex-wrap gap-3 py-5">
         <For each={image()}>{(item) => (<img src={item} />)}</For>
       </div>
     </main>
