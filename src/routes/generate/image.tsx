@@ -1,8 +1,9 @@
-import { For, createSignal } from 'solid-js';
+import { For, Match, Switch, createSignal } from 'solid-js';
 
 
 export default function GenerateImage() {
   const [inputValue, setInputValue] = createSignal('A picture of a street with trees in fall colors and leaves on the ground.')
+  const [errorValue, setErrorValue] = createSignal<string | null>(null)
   const [sizeValue, setSizeValue] = createSignal('small')
   const [loading, setLoading] = createSignal(false)
   const [image, setImage] = createSignal<string[]>()
@@ -16,6 +17,10 @@ export default function GenerateImage() {
       })
     }).then(r => r.json());
     setLoading(false);
+    if (res.error) {
+      setErrorValue(res.error);
+      return;
+    }
     setImage(res.images);
   }
 
@@ -24,6 +29,11 @@ export default function GenerateImage() {
       <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
         generate image
       </h1>
+      <Switch>
+        <Match when={errorValue()}>
+          <div class="text-red-500">{errorValue()}</div>
+        </Match>
+      </Switch>
       <article>
         <select
           value={sizeValue()}
