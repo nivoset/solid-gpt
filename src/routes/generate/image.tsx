@@ -1,11 +1,11 @@
-import { createSignal } from 'solid-js';
+import { For, createSignal } from 'solid-js';
 
 
 export default function GenerateImage() {
-  const [inputValue, setInputValue] = createSignal('in the art style of leronardo davinchi, draw the president')
+  const [inputValue, setInputValue] = createSignal('A picture of a street with trees in fall colors and leaves on the ground.')
   const [sizeValue, setSizeValue] = createSignal('small')
   const [loading, setLoading] = createSignal(false)
-  const [image, setImage] = createSignal<string>()
+  const [image, setImage] = createSignal<string[]>()
 
   const updateData = async () => {
     setLoading(true)
@@ -14,9 +14,9 @@ export default function GenerateImage() {
         prompt: inputValue(),
         size: sizeValue(),
       })
-    }).then(r => r.text());
-    setImage(res);
+    }).then(r => r.json());
     setLoading(false);
+    setImage(res.images);
   }
 
   return (
@@ -51,7 +51,9 @@ export default function GenerateImage() {
         Submit ({`${loading()}`})
       </button>
 
-      <img class="pt-5" src={image()} />
+      <div class="flex flex-wrap gap-3 pt-5">
+        <For each={image()}>{(item) => (<img src={item} />)}</For>
+      </div>
     </main>
   );
 }
