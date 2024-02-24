@@ -1,10 +1,10 @@
 import { For, Match, Switch, createSignal } from 'solid-js';
-
+import { makePersisted } from '@solid-primitives/storage'
 
 export default function GenerateImage() {
-  const [inputValue, setInputValue] = createSignal('A picture of a street with trees in fall colors and leaves on the ground.')
+  const [inputValue, setInputValue] = makePersisted(createSignal('A picture of a street with trees in fall colors and leaves on the ground.'), { name: 'image prompt' });
+  const [sizeValue, setSizeValue] = makePersisted(createSignal('small'), { name: 'image size'});
   const [errorValue, setErrorValue] = createSignal<string | null>(null)
-  const [sizeValue, setSizeValue] = createSignal('small')
   const [loading, setLoading] = createSignal(false)
   const [image, setImage] = createSignal<string[]>()
 
@@ -59,7 +59,7 @@ export default function GenerateImage() {
         class="bg-blue-400 shadow shadow-black rounded px-3 py-2 disabled:bg-grey-100"
         onClick={updateData}
       >
-        Submit ({`${loading()}`})
+        {loading() ? 'Processing...' : 'Submit'}
       </button>
 
       <div class="flex flex-wrap gap-3 py-5">
