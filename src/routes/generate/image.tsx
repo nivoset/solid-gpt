@@ -10,6 +10,7 @@ export default function GenerateImage() {
 
   const updateData = async () => {
     setLoading(true)
+    console.log('started')
     const res = await fetch('/api/ai/image', {
       method: 'put', body: JSON.stringify({
         prompt: inputValue(),
@@ -21,6 +22,7 @@ export default function GenerateImage() {
       setErrorValue(res.error);
       return;
     }
+    console.log('fin')
     setErrorValue(null);
     setImage(res.images);
   }

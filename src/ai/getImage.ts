@@ -21,10 +21,11 @@ export const getImage = async ({
   prompt: string;
   size: string;
 }) => {
+  console.log(prompt)
   try {
     const response = await openai.createImage({
       prompt,
-      n: 1,
+      n: 10,
       size: getSize(size),
       user: "test-account",
       response_format: "b64_json",

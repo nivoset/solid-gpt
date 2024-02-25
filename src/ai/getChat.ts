@@ -1,7 +1,11 @@
 import { openai } from "./openai.js";
 
 export const getChat = async (
-    prompt = "You: How do I combine arrays?\nJavaScript chatbot: You can use the concat() method.\nYou: How do you make an alert appear after 10 seconds?\nJavaScript chatbot"
+    prompt = `
+    You: How do I combine arrays?
+    JavaScript chatbot: You can use the concat() method.
+    You: How do you make an alert appear after 10 seconds?
+    JavaScript chatbot"`
 ) => {
     try {
         const response = await openai.createCompletion({
