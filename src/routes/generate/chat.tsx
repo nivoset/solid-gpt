@@ -6,8 +6,12 @@ type Content = { who: string; text: string; finishReason: string };
 
 const apiSchema = z
     .object({
-        text: z.string(),
+        index: z.number(),
         finish_reason: z.string(),
+        message: z.object({
+            role: z.string(),
+            content: z.string(),
+        })
     })
     .array();
 
@@ -38,7 +42,7 @@ export default function GenerateCode() {
             ...p,
             {
                 who: "bot",
-                text: parsed[0].text,
+                text: parsed[0].message.content,
                 finishReason: parsed[0].finish_reason,
             },
         ]);

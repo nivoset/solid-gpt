@@ -9,7 +9,7 @@ export const moderate = async (
 ) => {
   console.log(prompt);
     try {
-        const response = await openai.createModeration({
+        const response = await openai.moderations.create({
             // model: "text-davinci-003",
             input: prompt,
             // temperature: 0,
@@ -19,7 +19,7 @@ export const moderate = async (
             // presence_penalty: 0.0,
             // stop: ["You:"],
         });
-        const choices = response.data.results;
+        const choices = response.results;
         console.log(choices);
         return choices;
     } catch (e: unknown) {

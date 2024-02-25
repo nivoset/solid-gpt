@@ -8,9 +8,9 @@ export const getChat = async (
     JavaScript chatbot"`
 ) => {
     try {
-        const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt,
+        const response = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [{ role: 'user', content: prompt}],
             temperature: 0,
             max_tokens: 500,
             top_p: 1.0,
@@ -18,7 +18,7 @@ export const getChat = async (
             presence_penalty: 0.0,
             stop: ["You:"],
         });
-        const choices = response.data.choices;
+        const choices = response.choices;
 
         return choices;
     } catch (e: unknown) {

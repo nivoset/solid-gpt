@@ -16,7 +16,7 @@ export default function GenerateImage() {
         prompt: inputValue(),
         size: sizeValue(),
       })
-    }).then(r => r.json());
+    }).then(r => r.json() as any);
     setLoading(false);
     if (res.error) {
       setErrorValue(res.error);

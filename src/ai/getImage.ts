@@ -1,16 +1,15 @@
-import type { CreateImageRequestSizeEnum } from "openai";
 import { openai } from "./openai.js";
 
-const getSize = (size: string): CreateImageRequestSizeEnum => {
+const getSize = (size: string) => {
   switch (`${size}`.toLowerCase()) {
     case "small":
-      return "256x256";
+      return "256x256" as const;
     case "medium":
-      return "512x512";
+      return "512x512" as const;
     case "large":
-      return "1024x1024";
+      return "1024x1024" as const;
     default:
-      return "256x256";
+      return "256x256" as const;
   }
 };
 
@@ -23,15 +22,16 @@ export const getImage = async ({
 }) => {
   console.log(prompt)
   try {
-    const response = await openai.createImage({
+    const response = await openai.images.generate({
+      // model: 'dall-e-3',
       prompt,
-      n: 10,
+      n: 2,
       size: getSize(size),
-      user: "test-account",
+      // user: "test-account",
       response_format: "b64_json",
     });
 
-    const images = response.data.data.map((d) => `data:image/png;base64,${d.b64_json}`);
+    const images = response.data.map((d) => `data:image/png;base64,${d.b64_json}`);
 
     return ({ prompt, images });
   } catch (e: unknown) {

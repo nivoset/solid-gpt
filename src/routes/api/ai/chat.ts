@@ -6,7 +6,7 @@ export async function POST({ request }: APIEvent) {
     if (!body) return json([]);
     return json(
         await getChat(
-            `You: ${body}`
+            `${body}`
         )
     );
 }
