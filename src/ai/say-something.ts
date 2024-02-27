@@ -2,21 +2,19 @@ import { openai } from "./openai.js";
 import { appendFile } from 'fs'
 import path from 'path'
 
-export const satSomething = async (
-    prompt = `
-    You: How do I combine arrays?
-    JavaScript chatbot: You can use the concat() method.
-    You: How do you make an alert appear after 10 seconds?
-    JavaScript chatbot"`,
-    voice: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer" = "alloy"
-) => {
+export const satSomething = async ({
+  text, voice = "alloy"
+}: {
+    text: string,
+    voice: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
+}) => {
     try {
-        console.log('prompt', prompt);
+        console.log('prompt', text);
         // console.log('__dirname', __dirname);
-        const pa = path.join('.', `${prompt.replaceAll(' ', '_')}.mp3`);
+        const pa = path.join('.', `${text.replaceAll(' ', '_')}.mp3`);
         const response = await openai.audio.speech.create({
             model: "tts-1",
-            input: prompt,
+            input: text,
             voice,
         });
         // console.log(response);

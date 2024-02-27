@@ -27,7 +27,7 @@ export default function GenerateCode() {
         setLoading(true);
         const text = value();
 
-        const res = await fetch("/api/ai/say-something", { method: "post", body: text, }).then((r) => r.blob())
+        const res = await fetch("/api/ai/say-something", { method: "post", body: JSON.stringify({ text, voice: voice() }), }).then((r) => r.blob())
         // clean input value
         setStore(res);
 
