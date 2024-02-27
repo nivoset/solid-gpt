@@ -18,7 +18,7 @@ export const satSomething = async ({
             voice,
         });
         // console.log(response);
-        // console.log(response)
+        // save a file
         appendFile(pa, Buffer.from(await response.arrayBuffer()), (err: unknown) => err ? console.error(err) : console.log('succ'))
 
         return response.blob();
