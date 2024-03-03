@@ -1,20 +1,7 @@
 import { Match, Switch, createSignal } from "solid-js";
-import { z } from 'zod'
+import wretch from 'wretch'
 import { makePersisted } from '@solid-primitives/storage'
 import { Select } from "~/components/Select";
-
-type Content = { who: string; text: string; finishReason: string };
-
-const apiSchema = z
-    .object({
-        index: z.number(),
-        finish_reason: z.string(),
-        message: z.object({
-            role: z.string(),
-            content: z.string(),
-        })
-    })
-    .array();
 
 
 export default function GenerateCode() {
@@ -27,7 +14,7 @@ export default function GenerateCode() {
         setLoading(true);
         const text = value();
 
-        const res = await fetch("/api/ai/say-something", { method: "post", body: JSON.stringify({ text, voice: voice() }), }).then((r) => r.blob())
+        const res = await wretch("/api/ai/say-something").post({ text, voice: voice() }).blob();
         // clean input value
         setStore(res);
 
@@ -47,8 +34,8 @@ export default function GenerateCode() {
               </Switch>
 
             </article>
-            <div class="grid grid-cols-[90fr_10fr] group outline outline-transparent focus-within:outline-blue-400  shadow shadow-slate-900 rounded">
-            <Select
+            <div class="flex flex-col gap-2">
+              <Select
                 value={voice()}
                 disabled={loading()}
                 onChange={(e) => setVoice(e.target.value)}
@@ -60,6 +47,7 @@ export default function GenerateCode() {
                 <option value="nova">nova</option>
                 <option value="shimmer">shimmer</option>
               </Select>
+            <div class="grid grid-cols-[90fr_10fr] group outline outline-transparent focus-within:outline-blue-400  shadow shadow-slate-900 rounded">
                 <textarea
                     disabled={loading()}
                     class="outline rounded bg-gray-700 outline-transparent  w-[800px] h-[200px] px-2 py-1"
@@ -75,6 +63,7 @@ export default function GenerateCode() {
                 >
                     {loading() ? "Wait" : "Submit"}
                 </button>
+            </div>
             </div>
         </main>
     );
