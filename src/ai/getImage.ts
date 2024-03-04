@@ -24,12 +24,11 @@ export const getImage = async ({
     const response = await openai.images.generate({
       // model: 'dall-e-3',
       prompt,
-      n: 2,
+      n: 1,
       size: getSize(size),
       // user: "test-account",
       response_format: "b64_json",
     });
-    console.log(response);
     const images = response.data.map((d) => `data:image/png;base64,${d.b64_json}`);
 
     return ({ prompt, images });

@@ -1,6 +1,6 @@
 import { For, Match, Switch, createSignal, Suspense } from 'solid-js';
 import { makePersisted } from '@solid-primitives/storage'
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery, createInfiniteQuery } from '@tanstack/solid-query';
 import { fetch } from '~/fetch';
 import { z } from 'zod';
 
@@ -18,19 +18,33 @@ export default function GenerateImage() {
   const [sizeValue, setSizeValue] = makePersisted(createSignal('small'), { name: 'image size'});
   const [queryObject, setQueryObject] = createSignal<{ prompt: string, size: string } | null>(null)
 
-  const updateData = async () => {
-    setQueryObject({
-        prompt: inputValue(),
-        size: sizeValue(),
-      })
-  }
 
-  const imageCall = createQuery(() => ({
-    queryKey: ['image', queryObject],
+
+  const imageCall = createInfiniteQuery(() => ({
+    queryKey: ['image', queryObject()],
     enabled: queryObject() !== null,
     queryFn: async () => getImage(queryObject()),
-    select: (data) => data.images
+    getPreviousPageParam: () => true,
+    getNextPageParam: () => true,
+    initialPageParam: true,
+    // select: (data) => data.images
   }))
+
+  const updateData = async () => {
+    const prompt = inputValue();
+    const size = sizeValue();
+    if (prompt )
+    setQueryObject((prev) => {
+      if (prev?.prompt === prompt && prev?.size === size) {
+        imageCall.fetchPreviousPage();
+        return prev;
+      };
+      return    {
+        prompt: inputValue(),
+        size: sizeValue(),
+      }
+    })
+  }
 
   return (
     <main class="flex flex-col gap-3 justify-center items-center">
@@ -71,7 +85,15 @@ export default function GenerateImage() {
 
       <Suspense fallback={<div>Loading...</div>}>
         <div class="flex flex-wrap gap-3 py-5">
-          <For each={imageCall.data}>{(item) => (<img src={item} />)}</For>
+          <For each={imageCall.data?.pages}>
+            {(item) => (
+              <For each={item.images}>
+                {(item) => (
+                  <img src={item} />
+                )}
+              </For>
+          )}
+          </For>
         </div>
       </Suspense>
     </main>
