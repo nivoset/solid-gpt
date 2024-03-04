@@ -29,6 +29,7 @@ export const getImage = async ({
       // user: "test-account",
       response_format: "b64_json",
     });
+    console.log(response);
     const images = response.data.map((d) => `data:image/png;base64,${d.b64_json}`);
 
     return ({ prompt, images });
