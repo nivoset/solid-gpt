@@ -20,7 +20,6 @@ export const getImage = async ({
   prompt: string;
   size: string;
 }) => {
-  console.log(prompt)
   try {
     const response = await openai.images.generate({
       // model: 'dall-e-3',
@@ -30,7 +29,6 @@ export const getImage = async ({
       // user: "test-account",
       response_format: "b64_json",
     });
-
     const images = response.data.map((d) => `data:image/png;base64,${d.b64_json}`);
 
     return ({ prompt, images });

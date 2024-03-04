@@ -41,6 +41,9 @@ dependencies:
   zod:
     specifier: ^3.21.4
     version: 3.21.4
+  zod-wretch:
+    specifier: ^1.0.1
+    version: 1.0.1
 
 devDependencies:
   autoprefixer:
@@ -3441,6 +3444,12 @@ packages:
     hasBin: true
     dev: true
 
+  /typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: false
+
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: false
@@ -3674,6 +3683,14 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+
+  /zod-wretch@1.0.1:
+    resolution: {integrity: sha512-UiRZGuBE0CVigGKP3NfL+G87PfWpmQLDsCYm6ijagMM8I+equ2POURa8o06fXlIYVP3FYa51nlmKw/m6PgVPkg==}
+    dependencies:
+      typescript: 5.3.3
+      wretch: 2.8.0
+      zod: 3.21.4
+    dev: false
 
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}

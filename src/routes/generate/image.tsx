@@ -1,31 +1,36 @@
-import { For, Match, Switch, createSignal } from 'solid-js';
+import { For, Match, Switch, createSignal, Suspense } from 'solid-js';
 import { makePersisted } from '@solid-primitives/storage'
+import { createQuery } from '@tanstack/solid-query';
+import { fetch } from '~/fetch';
+import { z } from 'zod';
+
+const apiResponse = z.object({
+  images: z.string().array(),
+})
+
+const getImage = async (prompt: null | { prompt: string, size: string}): Promise<z.infer<typeof apiResponse>> => {
+  if (!prompt) return { images: [] };
+  return await fetch.url('/api/ai/image').put(prompt).jsonSchema(apiResponse);
+}
 
 export default function GenerateImage() {
   const [inputValue, setInputValue] = makePersisted(createSignal('A picture of a street with trees in fall colors and leaves on the ground.'), { name: 'image prompt' });
   const [sizeValue, setSizeValue] = makePersisted(createSignal('small'), { name: 'image size'});
-  const [errorValue, setErrorValue] = createSignal<string | null>(null)
-  const [loading, setLoading] = createSignal(false)
-  const [image, setImage] = createSignal<string[]>()
+  const [queryObject, setQueryObject] = createSignal<{ prompt: string, size: string } | null>(null)
 
   const updateData = async () => {
-    setLoading(true)
-    console.log('started')
-    const res = await fetch('/api/ai/image', {
-      method: 'put', body: JSON.stringify({
+    setQueryObject({
         prompt: inputValue(),
         size: sizeValue(),
       })
-    }).then(r => r.json() as any);
-    setLoading(false);
-    if (res.error) {
-      setErrorValue(res.error);
-      return;
-    }
-    console.log('fin')
-    setErrorValue(null);
-    setImage(res.images);
   }
+
+  const imageCall = createQuery(() => ({
+    queryKey: ['image', queryObject],
+    enabled: queryObject() !== null,
+    queryFn: async () => getImage(queryObject()),
+    select: (data) => data.images
+  }))
 
   return (
     <main class="flex flex-col gap-3 justify-center items-center">
@@ -33,14 +38,14 @@ export default function GenerateImage() {
         generate image
       </h1>
       <Switch>
-        <Match when={errorValue()}>
-          <div class="text-red-500">{errorValue()}</div>
+        <Match when={imageCall.isError}>
+          <div class="text-red-500">Failed to load</div>
         </Match>
       </Switch>
       <article>
         <select
           value={sizeValue()}
-          disabled={loading()}
+          disabled={imageCall.isFetching}
           onChange={(e) => setSizeValue(e.target.value)}
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         >
@@ -49,7 +54,7 @@ export default function GenerateImage() {
           <option value="large">Large</option>
         </select>
         <textarea
-          disabled={loading()}
+          disabled={imageCall.isFetching}
           class="outline rounded outline-gray-400 active:outline-blue-400 w-[800px] h-[200px] text-black"
           name="prompt"
           value={inputValue()}
@@ -57,16 +62,18 @@ export default function GenerateImage() {
         />
       </article>
       <button
-        disabled={loading()}
+        disabled={imageCall.isFetching}
         class="bg-blue-400 shadow shadow-black rounded px-3 py-2 disabled:bg-grey-100"
         onClick={updateData}
       >
-        {loading() ? 'Processing...' : 'Submit'}
+        {imageCall.isFetching ? 'Processing...' : 'Submit'}
       </button>
 
-      <div class="flex flex-wrap gap-3 py-5">
-        <For each={image()}>{(item) => (<img src={item} />)}</For>
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <div class="flex flex-wrap gap-3 py-5">
+          <For each={imageCall.data}>{(item) => (<img src={item} />)}</For>
+        </div>
+      </Suspense>
     </main>
   );
 }
